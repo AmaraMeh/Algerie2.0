@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Page Helper</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="window">
+      <header class="titlebar">
+        <div class="drag-region">
+          <span class="app-title">Student Page Helper</span>
+        </div>
+        <div class="window-controls">
+          <button id="minimizeBtn" title="Minimize">_</button>
+          <button id="closeBtn" title="Close">×</button>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button data-tab="replies" class="active">Replies</button>
+        <button data-tab="links">Links</button>
+        <button data-tab="notes">Notes</button>
+        <button data-tab="settings">Settings</button>
+      </nav>
+
+      <main class="content">
+        <section id="tab-replies" class="tab active">
+          <div class="section-header">
+            <div class="filters">
+              <select id="categoryFilter"></select>
+              <input id="searchInput" type="text" placeholder="Search..." />
+            </div>
+            <div class="actions">
+              <button id="addReplyBtn">Add Reply</button>
+            </div>
+          </div>
+          <div id="repliesList" class="list"></div>
+        </section>
+
+        <section id="tab-links" class="tab">
+          <div class="section-header">
+            <div class="actions">
+              <button id="addLinkBtn">Add Link</button>
+            </div>
+          </div>
+          <div id="linksList" class="list"></div>
+        </section>
+
+        <section id="tab-notes" class="tab">
+          <textarea id="notesArea" placeholder="Write meme ideas, captions, or tasks..." spellcheck="false"></textarea>
+        </section>
+
+        <section id="tab-settings" class="tab">
+          <div class="settings">
+            <div class="setting">
+              <label>
+                <span>Theme</span>
+                <select id="themeSelect">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </label>
+            </div>
+            <div class="setting">
+              <label>
+                <span>Accent Color</span>
+                <input type="color" id="accentColorInput" />
+              </label>
+            </div>
+            <div class="setting">
+              <label>
+                <input type="checkbox" id="alwaysOnTopToggle" />
+                <span>Always on Top</span>
+              </label>
+            </div>
+            <div class="setting">
+              <label>
+                <input type="checkbox" id="autoPasteToggle" />
+                <span>Auto-paste on global shortcuts</span>
+              </label>
+              <p class="hint">Linux tip: enable auto-paste with <code>xdotool</code> installed.</p>
+            </div>
+            <div class="setting">
+              <div class="shortcuts-info">
+                <strong>Global Shortcuts:</strong>
+                <p>Ctrl+Alt+1..9 paste Replies #1..9 into current text field.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span id="status"></span>
+      </footer>
+    </div>
+
+    <template id="replyItemTemplate">
+      <div class="reply-item">
+        <div class="meta">
+          <span class="category"></span>
+        </div>
+        <div class="text"></div>
+        <div class="actions">
+          <button class="btn-copy">Copy</button>
+          <button class="btn-edit">Edit</button>
+          <button class="btn-delete danger">Delete</button>
+        </div>
+      </div>
+    </template>
+
+    <template id="linkItemTemplate">
+      <div class="link-item">
+        <div class="meta">
+          <span class="title"></span>
+        </div>
+        <div class="url"></div>
+        <div class="actions">
+          <button class="btn-open">Open</button>
+          <button class="btn-edit">Edit</button>
+          <button class="btn-delete danger">Delete</button>
+        </div>
+      </div>
+    </template>
+
+    <script src="./renderer.js"></script>
+  </body>
+  </html>
+

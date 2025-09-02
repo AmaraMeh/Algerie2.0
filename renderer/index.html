@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Page Helper</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="title">Student Page Helper</div>
+        <nav class="tabs">
+          <button class="tab active" data-tab="replies">Quick Replies</button>
+          <button class="tab" data-tab="links">Links</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="settings">Settings</button>
+        </nav>
+      </header>
+
+      <main class="content">
+        <section id="tab-replies" class="tab-panel active">
+          <div class="panel-header">
+            <div class="category-filter">
+              <label>Category</label>
+              <select id="categoryFilter"></select>
+            </div>
+            <div class="hotkey-hint">Use Ctrl+1..9 anywhere</div>
+          </div>
+
+          <div class="reply-form">
+            <textarea id="replyText" rows="3" placeholder="Type a quick reply..."></textarea>
+            <div class="row">
+              <select id="replyCategory"></select>
+              <button id="addReplyBtn">Add Reply</button>
+            </div>
+          </div>
+
+          <ul id="repliesList" class="list"></ul>
+        </section>
+
+        <section id="tab-links" class="tab-panel">
+          <div class="add-link-form">
+            <input id="linkLabel" type="text" placeholder="Label (optional)" />
+            <input id="linkUrl" type="url" placeholder="https://example.com" />
+            <button id="addLinkBtn">Add Link</button>
+          </div>
+          <ul id="linksList" class="list"></ul>
+        </section>
+
+        <section id="tab-notes" class="tab-panel">
+          <textarea id="notesText" rows="16" placeholder="Your post ideas, captions, todos..."></textarea>
+          <div class="muted">Saved automatically</div>
+        </section>
+
+        <section id="tab-settings" class="tab-panel">
+          <div class="settings-grid">
+            <div class="setting-item">
+              <label>Theme</label>
+              <select id="themeSelect">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label>Accent color</label>
+              <input id="accentColor" type="color" />
+            </div>
+            <div class="setting-item">
+              <label><input type="checkbox" id="alwaysOnTopToggle" /> Always on top</label>
+            </div>
+            <div class="setting-item">
+              <label><input type="checkbox" id="autoPasteToggle" /> Auto paste after copy</label>
+              <div class="muted">Best effort; may need permissions or xdotool</div>
+            </div>
+            <div class="setting-item">
+              <label>Manage categories</label>
+              <div class="row">
+                <input id="newCategoryName" placeholder="New category" />
+                <button id="addCategoryBtn">Add</button>
+              </div>
+              <ul id="categoriesList" class="list compact"></ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+  </html>
+

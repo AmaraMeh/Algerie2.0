@@ -1,0 +1,43 @@
+{
+  "name": "student-page-helper",
+  "version": "1.0.0",
+  "description": "A floating always-on-top helper to manage quick replies, links, and notes for a student page.",
+  "main": "main.js",
+  "type": "commonjs",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.studentpage.helper",
+    "productName": "Student Page Helper",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": ["nsis"]
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility"
+    }
+  }
+}

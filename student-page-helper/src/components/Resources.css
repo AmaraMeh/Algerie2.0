@@ -1,0 +1,168 @@
+.resources {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.resource-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.resource-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow);
+}
+
+.resource-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.resource-category {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.resource-name {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.resource-url {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: monospace;
+  margin-bottom: 16px;
+  word-break: break-all;
+  padding: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.resource-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.open-button {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.open-button:hover {
+  background-color: #2AA44A;
+}
+
+.copy-button {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.copy-button:hover {
+  background-color: #0056CC;
+}
+
+.edit-button {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #E6850E;
+}
+
+.delete-button {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #D70015;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resource-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.resource-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cancel-button {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-button:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .resources-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .resource-card {
+    padding: 12px;
+  }
+  
+  .resource-actions {
+    gap: 6px;
+  }
+  
+  .resource-actions button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

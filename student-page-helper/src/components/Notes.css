@@ -1,0 +1,211 @@
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-item {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.note-item:hover {
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow);
+}
+
+.note-item.completed {
+  opacity: 0.7;
+  border-color: var(--success-color);
+}
+
+.note-item.completed .note-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.note-category {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.note-date {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.note-title {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.note-content {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.note-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.complete-button {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.complete-button:hover {
+  background-color: #2AA44A;
+}
+
+.complete-button.completed {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.complete-button.completed:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.copy-button {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.copy-button:hover {
+  background-color: #0056CC;
+}
+
+.edit-button {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #E6850E;
+}
+
+.delete-button {
+  background-color: var(--error-color);
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #D70015;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.note-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.note-textarea {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.note-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cancel-button {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-button:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .note-item {
+    padding: 12px;
+  }
+  
+  .note-actions {
+    gap: 6px;
+  }
+  
+  .note-actions button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  
+  .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

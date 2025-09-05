@@ -1,3 +1,77 @@
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Quick Reply Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="style.css" rel="stylesheet">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title">Quick Reply Manager</div>
+    <input id="searchInput" type="search" placeholder="Recherche par mot-clé..." aria-label="Recherche">
+  </header>
+
+  <section class="toolbar">
+    <label for="categorySelect">Catégorie:</label>
+    <select id="categorySelect"></select>
+    <div class="btn-group">
+      <button id="addCategoryBtn" class="btn">+ Catégorie</button>
+      <button id="editCategoryBtn" class="btn">Modifier</button>
+      <button id="deleteCategoryBtn" class="btn btn-danger">Supprimer</button>
+    </div>
+    <div class="spacer"></div>
+    <button id="addTemplateBtn" class="btn primary">+ Modèle</button>
+  </section>
+
+  <section id="searchResults" class="search-results hidden"></section>
+
+  <main class="main">
+    <aside class="list" id="templatesList"></aside>
+    <section class="viewer" id="templateViewer">
+      <div class="placeholder">Sélectionnez un modèle pour afficher le texte.</div>
+      <div class="viewer-content hidden">
+        <h3 id="viewerTitle"></h3>
+        <textarea id="viewerText" readonly></textarea>
+        <div class="viewer-actions">
+          <button id="copyBtn" class="btn primary">Copier</button>
+          <button id="editTemplateBtn" class="btn">Modifier</button>
+          <button id="deleteTemplateBtn" class="btn btn-danger">Supprimer</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="categoryDialog">
+    <form method="dialog" id="categoryForm">
+      <h3 id="categoryDialogTitle">Nouvelle catégorie</h3>
+      <input type="text" id="categoryNameInput" placeholder="Nom de la catégorie" required>
+      <menu>
+        <button value="cancel">Annuler</button>
+        <button id="saveCategoryBtn" value="save" class="primary">Enregistrer</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="templateDialog">
+    <form method="dialog" id="templateForm">
+      <h3 id="templateDialogTitle">Nouveau modèle</h3>
+      <input type="text" id="templateTitleInput" placeholder="Titre du message" required>
+      <textarea id="templateTextInput" placeholder="Texte de réponse" required></textarea>
+      <menu>
+        <button value="cancel">Annuler</button>
+        <button id="saveTemplateBtn" value="save" class="primary">Enregistrer</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
+
+=======
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -217,3 +291,4 @@
     <script src="popup.js"></script>
 </body>
 </html>
+

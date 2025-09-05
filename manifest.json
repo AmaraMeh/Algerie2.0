@@ -2,6 +2,11 @@
   "manifest_version": 3,
   "name": "Quick Reply Manager",
   "version": "1.0.0",
+
+  "description": "Une extension pour gérer des réponses rapides dans une popup Always-on-Top.",
+  "permissions": ["storage", "windows", "sidePanel"],
+  "action": {
+=======
   "description": "Une extension pour gérer des réponses rapides dans une popup Always-on-Top",
   "permissions": [
     "storage",
@@ -9,11 +14,27 @@
   ],
   "action": {
     "default_popup": "popup.html",
+
     "default_title": "Quick Reply Manager"
   },
   "background": {
     "service_worker": "background.js"
   },
+
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "commands": {
+    "toggle-quick-reply-window": {
+      "suggested_key": {
+        "default": "Alt+Q"
+      },
+      "description": "Ouvrir/fermer la fenêtre flottante Quick Reply"
+    }
+  }
+}
+
+=======
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
@@ -23,3 +44,4 @@
     "128": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiByeD0iMjAiIGZpbGw9IiM0Mjg1RjQiLz4KPHBhdGggZD0iTTY0IDMySDQ4Vjk2SDY0VjgwSDU2VjQwSDY0VjgwSDcyVjQwSDY0VjgwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTgwIDQ4SDY0VjU2SDgwVjQ4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTY0IDU4SDQ4VjY2SDY0VjU4WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=="
   }
 }
+

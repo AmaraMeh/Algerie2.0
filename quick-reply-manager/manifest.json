@@ -7,10 +7,14 @@
     "storage",
     "scripting",
     "tabs",
-    "activeTab"
+    "activeTab",
+    "identity"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "https://www.gstatic.com/*",
+    "https://firebase.googleapis.com/*",
+    "https://identitytoolkit.googleapis.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -28,7 +32,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["popup.html", "popup.js", "storage.js", "style.css"],
+      "resources": ["popup.html", "popup.js", "hybridStorage.js", "firebase.js", "style.css"],
       "matches": ["<all_urls>"]
     }
   ]

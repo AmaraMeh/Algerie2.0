@@ -1,0 +1,22 @@
+{
+  "name": "quick-reply-manager",
+  "version": "2.0.0",
+  "description": "Une extension Chrome pour gérer des réponses rapides avec synchronisation Firebase",
+  "main": "popup.js",
+  "scripts": {
+    "build": "echo 'Extension ready for loading'",
+    "test": "echo 'No tests specified'"
+  },
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "keywords": [
+    "chrome-extension",
+    "quick-reply",
+    "firebase",
+    "templates",
+    "productivity"
+  ],
+  "author": "Quick Reply Manager Team",
+  "license": "MIT"
+}

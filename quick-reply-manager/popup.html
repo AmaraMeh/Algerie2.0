@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quick Reply Manager</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div id="app" class="container">
@@ -14,6 +18,10 @@
         <span class="title">Quick Reply Manager</span>
       </div>
       <div class="actions">
+        <div id="authStatus" class="auth-status">
+          <span id="userInfo" class="user-info"></span>
+          <button id="authBtn" class="btn auth-btn">Se connecter</button>
+        </div>
         <input id="searchInput" type="search" placeholder="Rechercher..." class="input">
       </div>
     </header>
@@ -27,6 +35,8 @@
       </div>
       <div class="item-controls">
         <button id="addTemplateBtn" class="btn primary">Nouveau modèle</button>
+        <button id="sharedTemplatesBtn" class="btn secondary">Modèles partagés</button>
+        <button id="shareTemplateBtn" class="btn secondary" style="display: none;">Partager</button>
       </div>
     </section>
 
@@ -36,7 +46,8 @@
     </main>
   </div>
 
-  <script src="storage.js"></script>
+  <script src="firebase.js"></script>
+  <script src="hybridStorage.js"></script>
   <script src="popup.js"></script>
   <script>
     // Adjust layout when embedded in overlay iframe

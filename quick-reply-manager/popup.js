@@ -9,8 +9,20 @@
   const renameCategoryBtn = document.getElementById('renameCategoryBtn');
   const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
   const addTemplateBtn = document.getElementById('addTemplateBtn');
+  const authBtn = document.getElementById('authBtn');
+  const userInfo = document.getElementById('userInfo');
+  const sharedTemplatesBtn = document.getElementById('sharedTemplatesBtn');
+  const shareTemplateBtn = document.getElementById('shareTemplateBtn');
 
-  let state = { categories: [], currentCategoryId: null, query: '' };
+  let state = { 
+    categories: [], 
+    currentCategoryId: null, 
+    query: '', 
+    isAuthenticated: false,
+    currentUser: null,
+    sharedTemplates: [],
+    currentTemplate: null
+  };
 
   function setState(partial) {
     state = { ...state, ...partial };
@@ -18,10 +30,72 @@
   }
 
   async function load() {
-    const data = await window.QRMStorage.getData();
-    const categories = data.categories || [];
-    const currentCategoryId = categories[0]?.id ?? null;
-    setState({ categories, currentCategoryId });
+    try {
+      // Wait for Firebase to initialize
+      if (window.FirebaseService) {
+        await window.FirebaseService.init();
+        const user = window.FirebaseService.getCurrentUser();
+        setState({ 
+          isAuthenticated: !!user, 
+          currentUser: user 
+        });
+        updateAuthUI();
+      }
+      
+      const data = await window.QRMStorage.getData();
+      const categories = data.categories || [];
+      const currentCategoryId = categories[0]?.id ?? null;
+      setState({ categories, currentCategoryId });
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }
+
+  function updateAuthUI() {
+    if (state.isAuthenticated && state.currentUser) {
+      userInfo.textContent = state.currentUser.email;
+      authBtn.textContent = 'Se déconnecter';
+      authBtn.onclick = handleSignOut;
+    } else {
+      userInfo.textContent = '';
+      authBtn.textContent = 'Se connecter';
+      authBtn.onclick = handleSignIn;
+    }
+  }
+
+  async function handleSignIn() {
+    try {
+      authBtn.textContent = 'Connexion...';
+      authBtn.disabled = true;
+      
+      const user = await window.FirebaseService.signInWithGoogle();
+      setState({ 
+        isAuthenticated: true, 
+        currentUser: user 
+      });
+      updateAuthUI();
+      
+      // Reload data after authentication
+      await load();
+    } catch (error) {
+      console.error('Sign in error:', error);
+      alert('Erreur de connexion: ' + error.message);
+    } finally {
+      authBtn.disabled = false;
+    }
+  }
+
+  async function handleSignOut() {
+    try {
+      await window.FirebaseService.signOut();
+      setState({ 
+        isAuthenticated: false, 
+        currentUser: null 
+      });
+      updateAuthUI();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   }
 
   function saveCategories(categories) {
@@ -62,6 +136,7 @@
   }
 
   function showTemplate(tmpl) {
+    setState({ currentTemplate: tmpl });
     detail.innerHTML = '';
     const header = document.createElement('div');
     header.className = 'detail-header';
@@ -77,8 +152,56 @@
       try {
         await navigator.clipboard.writeText(tmpl.text);
         copyBtn.textContent = 'Copié!';
-        setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
-      } catch (e) {}
+        copyBtn.style.background = '#10b981';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copier';
+          copyBtn.style.background = '';
+        }, 1200);
+      } catch (e) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = tmpl.text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        copyBtn.textContent = 'Copié!';
+        copyBtn.style.background = '#10b981';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copier';
+          copyBtn.style.background = '';
+        }, 1200);
+      }
+    });
+
+    const pasteBtn = document.createElement('button');
+    pasteBtn.className = 'btn secondary';
+    pasteBtn.textContent = 'Coller dans la conversation';
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        // Send message to content script to paste the text
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.id) {
+          await chrome.tabs.sendMessage(tab.id, { 
+            type: "PASTE_TEXT", 
+            text: tmpl.text 
+          });
+          pasteBtn.textContent = 'Collé!';
+          pasteBtn.style.background = '#10b981';
+          setTimeout(() => {
+            pasteBtn.textContent = 'Coller dans la conversation';
+            pasteBtn.style.background = '';
+          }, 1200);
+        }
+      } catch (e) {
+        console.error('Error pasting text:', e);
+        pasteBtn.textContent = 'Erreur';
+        pasteBtn.style.background = '#ef4444';
+        setTimeout(() => {
+          pasteBtn.textContent = 'Coller dans la conversation';
+          pasteBtn.style.background = '';
+        }, 1200);
+      }
     });
 
     const editBtn = document.createElement('button');
@@ -97,7 +220,40 @@
       detail.innerHTML = '';
     });
 
-    actions.append(copyBtn, editBtn, delBtn);
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'btn secondary';
+    shareBtn.textContent = 'Partager';
+    shareBtn.style.display = state.isAuthenticated ? 'inline-block' : 'none';
+    shareBtn.addEventListener('click', async () => {
+      try {
+        const category = currentCategory();
+        if (!category) return;
+        
+        shareBtn.textContent = 'Partage...';
+        shareBtn.disabled = true;
+        
+        await window.QRMStorage.shareTemplate(tmpl, category.name);
+        
+        shareBtn.textContent = 'Partagé!';
+        shareBtn.style.background = '#10b981';
+        setTimeout(() => {
+          shareBtn.textContent = 'Partager';
+          shareBtn.style.background = '';
+          shareBtn.disabled = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Error sharing template:', error);
+        shareBtn.textContent = 'Erreur';
+        shareBtn.style.background = '#ef4444';
+        setTimeout(() => {
+          shareBtn.textContent = 'Partager';
+          shareBtn.style.background = '';
+          shareBtn.disabled = false;
+        }, 2000);
+      }
+    });
+
+    actions.append(copyBtn, pasteBtn, shareBtn, editBtn, delBtn);
     header.append(h3, actions);
 
     const pre = document.createElement('textarea');
@@ -195,6 +351,103 @@
     detail.append(empty);
   }
 
+  async function loadSharedTemplates() {
+    try {
+      // Show loading state
+      detail.innerHTML = '';
+      const loading = document.createElement('div');
+      loading.className = 'loading';
+      loading.textContent = 'Chargement des modèles partagés...';
+      detail.append(loading);
+      
+      const sharedTemplates = await window.QRMStorage.getSharedTemplates();
+      setState({ sharedTemplates });
+      showSharedTemplates();
+    } catch (error) {
+      console.error('Error loading shared templates:', error);
+      detail.innerHTML = '';
+      const error = document.createElement('div');
+      error.className = 'empty';
+      error.textContent = 'Erreur lors du chargement des modèles partagés.';
+      detail.append(error);
+    }
+  }
+
+  function showSharedTemplates() {
+    detail.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'detail-header';
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Modèles partagés';
+    const backBtn = document.createElement('button');
+    backBtn.className = 'btn btn-ghost';
+    backBtn.textContent = '← Retour';
+    backBtn.addEventListener('click', () => {
+      detail.innerHTML = '';
+      renderDetailEmpty();
+    });
+    header.append(h3, backBtn);
+
+    const list = document.createElement('div');
+    list.className = 'shared-templates-list';
+    
+    if (state.sharedTemplates.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Aucun modèle partagé disponible.';
+      list.append(empty);
+    } else {
+      for (const template of state.sharedTemplates) {
+        const item = document.createElement('div');
+        item.className = 'shared-template-item';
+        
+        const title = document.createElement('div');
+        title.className = 'shared-template-title';
+        title.textContent = template.title;
+        
+        const meta = document.createElement('div');
+        meta.className = 'shared-template-meta';
+        meta.textContent = `${template.categoryName} • Par ${template.sharedByEmail}`;
+        
+        const actions = document.createElement('div');
+        actions.className = 'shared-template-actions';
+        
+        const importBtn = document.createElement('button');
+        importBtn.className = 'btn primary';
+        importBtn.textContent = 'Importer';
+        importBtn.addEventListener('click', async () => {
+          try {
+            const category = currentCategory();
+            if (!category) {
+              alert('Veuillez sélectionner une catégorie d\'abord.');
+              return;
+            }
+            
+            const newTemplate = {
+              id: crypto.randomUUID(),
+              title: template.title,
+              text: template.text
+            };
+            
+            await window.QRMStorage.upsertTemplate(category.id, newTemplate);
+            const data = await window.QRMStorage.getData();
+            setState({ categories: data.categories });
+            showTemplate(newTemplate);
+          } catch (error) {
+            console.error('Error importing template:', error);
+            alert('Erreur lors de l\'importation du modèle.');
+          }
+        });
+        
+        actions.append(importBtn);
+        item.append(title, meta, actions);
+        list.append(item);
+      }
+    }
+    
+    detail.append(header, list);
+  }
+
   function render() {
     renderCategories();
     renderList();
@@ -208,6 +461,7 @@
   renameCategoryBtn.addEventListener('click', onRenameCategory);
   deleteCategoryBtn.addEventListener('click', onDeleteCategory);
   addTemplateBtn.addEventListener('click', () => openTemplateEditor());
+  sharedTemplatesBtn.addEventListener('click', loadSharedTemplates);
 
   // Initialize
   load();

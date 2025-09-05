@@ -1,79 +1,157 @@
-# Student Page Helper
+# Quick Reply Manager
 
-A floating, always-on-top desktop helper to manage quick replies, links, and notes for your student Instagram/Telegram page.
+Une extension Chrome pour gérer des réponses rapides dans une popup Always-on-Top.
 
-## Features
-- **Always-on-top window**: small, draggable, resizable.
-- **Quick Reply Manager**: add/edit/delete, categorize (Scholarships, Exams, General, Memes), one-click copy, optional auto-paste.
-- **Global shortcuts**: Ctrl+1..9 to copy/paste the first nine replies.
-- **Saved Links & Resources**: open your frequently used links in the default browser.
-- **Post Ideas & Notes**: simple notes area with auto-save.
-- **Customization**: dark/light mode, accent color, always-on-top toggle.
-- **Local persistence**: powered by `electron-store`.
+## 🚀 Fonctionnalités
 
-## Tech Stack
-- Electron.js (Main/Preload)
-- Vanilla HTML/CSS/JS for renderer (simple and lightweight)
-- electron-store for local storage
+- **Popup flottante** : Interface toujours accessible pendant la navigation
+- **Système de catégories** : Organisez vos réponses par thème (ex: "Inscription", "Carte étudiant", "Transfert")
+- **Modèles de réponses** : Créez des réponses avec titre et texte complet
+- **Recherche rapide** : Trouvez instantanément vos réponses par mot-clé
+- **Copie en un clic** : Copiez vos réponses dans le presse-papier
+- **Interface moderne** : Design minimaliste et intuitif
+- **Stockage local** : Vos données restent privées sur votre machine
+- **Import/Export** : Sauvegardez et restaurez vos données
 
-## Prerequisites
-1. Install Node.js (LTS recommended):
-   - Windows/macOS: download from `https://nodejs.org`
-   - Linux: use your distro’s package manager or NodeSource
-2. Verify installation:
-```bash
-node -v
-npm -v
+## 📦 Installation
+
+### Méthode 1 : Installation en mode développeur
+
+1. **Téléchargez ou clonez** ce projet sur votre machine
+2. **Ouvrez Chrome** et allez dans `chrome://extensions/`
+3. **Activez le mode développeur** (bouton en haut à droite)
+4. **Cliquez sur "Charger l'extension non empaquetée"**
+5. **Sélectionnez le dossier** contenant les fichiers de l'extension
+6. **L'extension est maintenant installée** ! 🎉
+
+### Méthode 2 : Installation depuis le Chrome Web Store
+
+*Bientôt disponible...*
+
+## 🎯 Utilisation
+
+### Première utilisation
+
+1. **Cliquez sur l'icône** de l'extension dans la barre d'outils Chrome
+2. **Créez votre première catégorie** en cliquant sur le bouton "+" à côté des onglets
+3. **Ajoutez des réponses** en cliquant sur "Ajouter une réponse"
+
+### Gestion des catégories
+
+- **Créer** : Cliquez sur le bouton "+" à côté des onglets
+- **Supprimer** : Survolez un onglet et cliquez sur le "×"
+- **Basculer** : Cliquez sur l'onglet de votre choix
+
+### Gestion des réponses
+
+- **Ajouter** : Cliquez sur "Ajouter une réponse" ou utilisez `Ctrl+N`
+- **Modifier** : Cliquez sur une réponse, puis sur l'icône d'édition
+- **Supprimer** : Cliquez sur une réponse, puis sur l'icône de suppression
+- **Copier** : Cliquez sur une réponse, puis sur "Copier"
+
+### Recherche
+
+- **Recherche rapide** : Tapez dans la barre de recherche (minimum 2 caractères)
+- **Raccourci** : `Ctrl+K` pour accéder rapidement à la recherche
+- **Effacer** : Cliquez sur le "×" dans la barre de recherche
+
+### Paramètres
+
+- **Export** : Sauvegardez vos données en JSON
+- **Import** : Restaurez vos données depuis un fichier JSON
+- **Effacer tout** : Supprime toutes les données (irréversible)
+
+## ⌨️ Raccourcis clavier
+
+- `Ctrl+K` : Focus sur la barre de recherche
+- `Ctrl+N` : Nouvelle réponse
+- `Échap` : Fermer les modales
+
+## 🏗️ Structure du projet
+
+```
+quick-reply-manager/
+├── manifest.json          # Configuration de l'extension (Manifest V3)
+├── popup.html             # Interface utilisateur principale
+├── popup.js               # Logique de l'interface
+├── storage.js             # Gestionnaire de stockage des données
+├── background.js          # Service worker pour la persistance
+├── style.css              # Styles CSS modernes
+└── README.md              # Documentation
 ```
 
-## Install Dependencies
-```bash
-npm install
-```
+## 🔧 Technologies utilisées
 
-## Run in Development
-```bash
-npm start
-```
+- **Manifest V3** : Dernière version des extensions Chrome
+- **Chrome Storage API** : Stockage local sécurisé
+- **Vanilla JavaScript** : Pas de dépendances externes
+- **CSS moderne** : Flexbox, Grid, animations
+- **HTML5** : Structure sémantique
 
-## Build a Production App
-This project uses `electron-builder`.
+## 📱 Compatibilité
 
-- Windows (NSIS installer):
-```bash
-npm run build
-```
-- Linux (AppImage):
-```bash
-npm run build
-```
+- **Chrome** : Version 88+
+- **Edge** : Version 88+ (basé sur Chromium)
+- **Brave** : Version 88+
+- **Autres navigateurs Chromium** : Version 88+
 
-Artifacts are saved to the `dist/` folder. To add platform-specific icons, place them in the `build/` directory and configure optional `icon` fields in `package.json > build` (e.g., `.ico` for Windows, `.png` for Linux).
+## 🔒 Confidentialité
 
-## Keyboard Shortcuts
-- **Ctrl+1..9**: Copy (and if enabled, auto-paste) the nth quick reply.
+- **Aucune donnée envoyée** vers des serveurs externes
+- **Stockage local uniquement** : Vos données restent sur votre machine
+- **Aucun tracking** : L'extension ne collecte aucune information personnelle
+- **Code open source** : Vous pouvez vérifier le code source
 
-## Auto-Paste Notes
-Auto-paste tries to send Cmd/Ctrl+V to the active app using platform tools:
-- Windows: PowerShell WScript SendKeys
-- macOS: AppleScript via `osascript` (may require Accessibility permissions)
-- Linux: `xdotool` on X11 (Wayland may not support this)
+## 🐛 Dépannage
 
-If it doesn’t work, grant permissions or install `xdotool`, or disable the feature in Settings.
+### L'extension ne se charge pas
+- Vérifiez que le mode développeur est activé
+- Assurez-vous que tous les fichiers sont présents
+- Rechargez l'extension dans `chrome://extensions/`
 
-## Project Structure
-```
-.
-├─ main.js            # Electron main process
-├─ preload.js         # Secure IPC bridge
-├─ renderer/
-│  ├─ index.html
-│  ├─ renderer.js
-│  └─ styles.css
-├─ build/             # Packager resources (icons, etc.)
-├─ package.json
-└─ README.md
-```
+### Les données ne se sauvegardent pas
+- Vérifiez les permissions de l'extension
+- Redémarrez Chrome
+- Vérifiez l'espace de stockage disponible
 
-## License
-MIT
+### La copie ne fonctionne pas
+- Assurez-vous que Chrome a les permissions nécessaires
+- Testez sur un site web simple
+- Vérifiez que le texte n'est pas vide
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+
+1. **Signaler des bugs** via les issues
+2. **Proposer des améliorations** via les issues
+3. **Soumettre des pull requests**
+4. **Améliorer la documentation**
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🆕 Changelog
+
+### Version 1.0.0
+- ✅ Interface utilisateur moderne
+- ✅ Système de catégories
+- ✅ Gestion des réponses rapides
+- ✅ Recherche en temps réel
+- ✅ Copie dans le presse-papier
+- ✅ Import/Export des données
+- ✅ Raccourcis clavier
+- ✅ Stockage local sécurisé
+
+## 📞 Support
+
+Si vous rencontrez des problèmes ou avez des questions :
+
+1. **Vérifiez cette documentation**
+2. **Consultez les issues** sur GitHub
+3. **Créez une nouvelle issue** si nécessaire
+
+---
+
+**Développé avec ❤️ pour améliorer votre productivité**

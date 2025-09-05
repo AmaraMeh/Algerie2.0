@@ -9,6 +9,7 @@
   const renameCategoryBtn = document.getElementById('renameCategoryBtn');
   const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
   const addTemplateBtn = document.getElementById('addTemplateBtn');
+  const loginBtn = document.getElementById('loginBtn');
 
   let state = { categories: [], currentCategoryId: null, query: '' };
 
@@ -76,9 +77,33 @@
     copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(tmpl.text);
-        copyBtn.textContent = 'Copié!';
-        setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
-      } catch (e) {}
+      } catch (e) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = tmpl.text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        } catch (_) {}
+      }
+      copyBtn.textContent = 'Copié!';
+      setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
+    });
+
+    const pasteBtn = document.createElement('button');
+    pasteBtn.className = 'btn';
+    pasteBtn.textContent = 'Coller';
+    pasteBtn.title = 'Coller dans la conversation';
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        chrome.runtime.sendMessage({ type: 'QRM_PASTE_TEXT_REQUEST', text: tmpl.text });
+        pasteBtn.textContent = 'Collé!';
+        setTimeout(() => (pasteBtn.textContent = 'Coller'), 1200);
+      } catch (_) {}
     });
 
     const editBtn = document.createElement('button');
@@ -97,15 +122,31 @@
       detail.innerHTML = '';
     });
 
-    actions.append(copyBtn, editBtn, delBtn);
+    actions.append(copyBtn, pasteBtn, editBtn, delBtn);
     header.append(h3, actions);
 
-    const pre = document.createElement('textarea');
-    pre.className = 'detail-text';
-    pre.value = tmpl.text;
-    pre.readOnly = true;
+    const textArea = document.createElement('textarea');
+    textArea.className = 'detail-text';
+    textArea.value = tmpl.text;
+    textArea.style.resize = 'vertical';
 
-    detail.append(header, pre);
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn';
+    saveBtn.textContent = 'Sauvegarder';
+    saveBtn.addEventListener('click', async () => {
+      const updated = { ...tmpl, text: textArea.value };
+      await window.QRMStorage.upsertTemplate(state.currentCategoryId, updated);
+      const data = await window.QRMStorage.getData();
+      setState({ categories: data.categories });
+      saveBtn.textContent = 'Enregistré';
+      setTimeout(() => (saveBtn.textContent = 'Sauvegarder'), 1200);
+    });
+
+    const footer = document.createElement('div');
+    footer.className = 'detail-footer';
+    footer.appendChild(saveBtn);
+
+    detail.append(header, textArea, footer);
   }
 
   function openTemplateEditor(tmpl) {
@@ -208,6 +249,14 @@
   renameCategoryBtn.addEventListener('click', onRenameCategory);
   deleteCategoryBtn.addEventListener('click', onDeleteCategory);
   addTemplateBtn.addEventListener('click', () => openTemplateEditor());
+  loginBtn?.addEventListener('click', async () => {
+    try {
+      // Trigger auth ensure; acts as anonymous sign-in by default
+      await window.QRMFirebase?.pull();
+      loginBtn.textContent = 'Connecté';
+      setTimeout(() => (loginBtn.textContent = 'Se connecter'), 2000);
+    } catch (_) {}
+  });
 
   // Initialize
   load();

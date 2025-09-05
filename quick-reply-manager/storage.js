@@ -16,6 +16,9 @@ function withDefaults(data) {
       }
     ];
   }
+  if (typeof data.updatedAt !== "number") {
+    data.updatedAt = Date.now();
+  }
   return data;
 }
 
@@ -29,7 +32,11 @@ function getData() {
 
 function setData(data) {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ [QRM_KEY]: data }, () => resolve());
+    const payload = withDefaults({ ...data, updatedAt: Date.now() });
+    chrome.storage.local.set({ [QRM_KEY]: payload }, async () => {
+      try { await window.QRMFirebase?.push(payload); } catch (_) {}
+      resolve();
+    });
   });
 }
 
@@ -66,7 +73,17 @@ async function deleteTemplate(categoryId, templateId) {
 }
 
 window.QRMStorage = {
-  getData,
+  async getData() {
+    const local = await getData();
+    try {
+      const remote = await window.QRMFirebase?.pull();
+      if (remote && typeof remote.updatedAt === "number" && remote.updatedAt > (local.updatedAt || 0)) {
+        await setData(remote);
+        return remote;
+      }
+    } catch (_) {}
+    return local;
+  },
   setData,
   upsertCategory,
   deleteCategory,

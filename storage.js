@@ -1,3 +1,4 @@
+
 const STORAGE_KEY = "qrm_data_v1";
 
 function getFromStorage(keys) {
@@ -154,3 +155,229 @@ export const QRMStorage = {
 
 export default QRMStorage;
 
+=======
+/**
+ * Gestionnaire de stockage pour Quick Reply Manager
+ * Utilise chrome.storage.local pour persister les données
+ */
+
+class StorageManager {
+  constructor() {
+    this.storageKey = 'quickReplyData';
+    this.defaultData = {
+      categories: [
+        {
+          id: 'default',
+          name: 'Général',
+          replies: [
+            {
+              id: 'welcome',
+              title: 'Message de bienvenue',
+              text: 'Bonjour,\n\nMerci pour votre message. Je vous répondrai dans les plus brefs délais.\n\nCordialement'
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialise le stockage avec les données par défaut si nécessaire
+   */
+  async initialize() {
+    try {
+      const data = await this.getData();
+      if (!data || !data.categories || data.categories.length === 0) {
+        await this.saveData(this.defaultData);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation du stockage:', error);
+    }
+  }
+
+  /**
+   * Récupère toutes les données
+   */
+  async getData() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([this.storageKey], (result) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(result[this.storageKey] || this.defaultData);
+        }
+      });
+    });
+  }
+
+  /**
+   * Sauvegarde toutes les données
+   */
+  async saveData(data) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.set({ [this.storageKey]: data }, () => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Récupère toutes les catégories
+   */
+  async getCategories() {
+    const data = await this.getData();
+    return data.categories || [];
+  }
+
+  /**
+   * Ajoute une nouvelle catégorie
+   */
+  async addCategory(name) {
+    const data = await this.getData();
+    const newCategory = {
+      id: this.generateId(),
+      name: name.trim(),
+      replies: []
+    };
+    data.categories.push(newCategory);
+    await this.saveData(data);
+    return newCategory;
+  }
+
+  /**
+   * Met à jour une catégorie
+   */
+  async updateCategory(categoryId, newName) {
+    const data = await this.getData();
+    const category = data.categories.find(cat => cat.id === categoryId);
+    if (category) {
+      category.name = newName.trim();
+      await this.saveData(data);
+      return category;
+    }
+    throw new Error('Catégorie non trouvée');
+  }
+
+  /**
+   * Supprime une catégorie
+   */
+  async deleteCategory(categoryId) {
+    const data = await this.getData();
+    data.categories = data.categories.filter(cat => cat.id !== categoryId);
+    await this.saveData(data);
+  }
+
+  /**
+   * Récupère les réponses d'une catégorie
+   */
+  async getReplies(categoryId) {
+    const data = await this.getData();
+    const category = data.categories.find(cat => cat.id === categoryId);
+    return category ? category.replies : [];
+  }
+
+  /**
+   * Ajoute une nouvelle réponse à une catégorie
+   */
+  async addReply(categoryId, title, text) {
+    const data = await this.getData();
+    const category = data.categories.find(cat => cat.id === categoryId);
+    if (category) {
+      const newReply = {
+        id: this.generateId(),
+        title: title.trim(),
+        text: text.trim()
+      };
+      category.replies.push(newReply);
+      await this.saveData(data);
+      return newReply;
+    }
+    throw new Error('Catégorie non trouvée');
+  }
+
+  /**
+   * Met à jour une réponse
+   */
+  async updateReply(categoryId, replyId, title, text) {
+    const data = await this.getData();
+    const category = data.categories.find(cat => cat.id === categoryId);
+    if (category) {
+      const reply = category.replies.find(rep => rep.id === replyId);
+      if (reply) {
+        reply.title = title.trim();
+        reply.text = text.trim();
+        await this.saveData(data);
+        return reply;
+      }
+    }
+    throw new Error('Réponse non trouvée');
+  }
+
+  /**
+   * Supprime une réponse
+   */
+  async deleteReply(categoryId, replyId) {
+    const data = await this.getData();
+    const category = data.categories.find(cat => cat.id === categoryId);
+    if (category) {
+      category.replies = category.replies.filter(rep => rep.id !== replyId);
+      await this.saveData(data);
+    }
+  }
+
+  /**
+   * Recherche dans toutes les réponses
+   */
+  async searchReplies(query) {
+    const data = await this.getData();
+    const results = [];
+    const searchTerm = query.toLowerCase().trim();
+
+    data.categories.forEach(category => {
+      category.replies.forEach(reply => {
+        if (reply.title.toLowerCase().includes(searchTerm) || 
+            reply.text.toLowerCase().includes(searchTerm)) {
+          results.push({
+            ...reply,
+            categoryName: category.name,
+            categoryId: category.id
+          });
+        }
+      });
+    });
+
+    return results;
+  }
+
+  /**
+   * Génère un ID unique
+   */
+  generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  /**
+   * Exporte toutes les données (pour sauvegarde)
+   */
+  async exportData() {
+    return await this.getData();
+  }
+
+  /**
+   * Importe des données (pour restauration)
+   */
+  async importData(data) {
+    if (data && data.categories && Array.isArray(data.categories)) {
+      await this.saveData(data);
+      return true;
+    }
+    throw new Error('Format de données invalide');
+  }
+}
+
+// Instance globale
+const storageManager = new StorageManager();

@@ -2,14 +2,25 @@
   "manifest_version": 3,
   "name": "Quick Reply Manager",
   "version": "1.0.0",
+
   "description": "Une extension pour gérer des réponses rapides dans une popup Always-on-Top.",
   "permissions": ["storage", "windows", "sidePanel"],
   "action": {
+=======
+  "description": "Une extension pour gérer des réponses rapides dans une popup Always-on-Top",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+
     "default_title": "Quick Reply Manager"
   },
   "background": {
     "service_worker": "background.js"
   },
+
   "side_panel": {
     "default_path": "popup.html"
   },
@@ -20,6 +31,17 @@
       },
       "description": "Ouvrir/fermer la fenêtre flottante Quick Reply"
     }
+  }
+}
+
+=======
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "icons": {
+    "16": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiByeD0iMyIgZmlsbD0iIzQyODVGNCIvPgo8cGF0aCBkPSJNOCA0SDZWNkg4VjRaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTAgNkg2VjhIMTBWNloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik04IDEwSDZWMkg4VjEwWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "48": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iOCIgZmlsbD0iIzQyODVGNCIvPgo8cGF0aCBkPSJNMjQgMTJIMThWMjRIMjRWMjBIMjJWMTRIMjRWMjBIMjZWMTRIMjRWMjBaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMzAgMThIMjRWMjBIMzBWMThaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMjQgMjJIMThWMjRIMjRWMjJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+    "128": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiByeD0iMjAiIGZpbGw9IiM0Mjg1RjQiLz4KPHBhdGggZD0iTTY0IDMySDQ4Vjk2SDY0VjgwSDU2VjQwSDY0VjgwSDcyVjQwSDY0VjgwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTgwIDQ4SDY0VjU2SDgwVjQ4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTY0IDU4SDQ4VjY2SDY0VjU4WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=="
   }
 }
 

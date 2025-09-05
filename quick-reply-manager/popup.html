@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Reply Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="container">
+    <header class="app-header">
+      <div class="brand">
+        <span class="logo">⚡</span>
+        <span class="title">Quick Reply Manager</span>
+      </div>
+      <div class="actions">
+        <input id="searchInput" type="search" placeholder="Rechercher..." class="input">
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <div class="category-controls">
+        <select id="categorySelect" class="select"></select>
+        <button id="addCategoryBtn" class="btn">Nouvelle catégorie</button>
+        <button id="renameCategoryBtn" class="btn">Renommer</button>
+        <button id="deleteCategoryBtn" class="btn btn-ghost">Supprimer</button>
+      </div>
+      <div class="item-controls">
+        <button id="addTemplateBtn" class="btn primary">Nouveau modèle</button>
+      </div>
+    </section>
+
+    <main class="main">
+      <aside class="list" id="templateList"></aside>
+      <section class="detail" id="detail"></section>
+    </main>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="popup.js"></script>
+  <script>
+    // Adjust layout when embedded in overlay iframe
+    const params = new URLSearchParams(location.search);
+    if (params.get('embedded') === '1') {
+      document.body.classList.add('embedded');
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Reply Manager",
+  "description": "Une extension pour gérer des réponses rapides dans une popup Always-on-Top.",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Quick Reply Manager"
+  },
+  "commands": {
+    "toggle_overlay": {
+      "suggested_key": {
+        "default": "Alt+Q"
+      },
+      "description": "Afficher/Masquer la popup flottante"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html", "popup.js", "storage.js", "style.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

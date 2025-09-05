@@ -9,8 +9,14 @@
   const renameCategoryBtn = document.getElementById('renameCategoryBtn');
   const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
   const addTemplateBtn = document.getElementById('addTemplateBtn');
+  const signInBtn = document.getElementById('signInBtn');
+  const signOutBtn = document.getElementById('signOutBtn');
+  const syncBtn = document.getElementById('syncBtn');
+  const userEmail = document.getElementById('userEmail');
+  const signedIn = document.getElementById('signedIn');
 
   let state = { categories: [], currentCategoryId: null, query: '' };
+  let auth = { signedIn: false, email: '' };
 
   function setState(partial) {
     state = { ...state, ...partial };
@@ -18,10 +24,22 @@
   }
 
   async function load() {
+    // Try cloud first if signed in; otherwise local
+    try {
+      const cloud = await window.QRMCloud.loadIfSignedIn();
+      if (cloud && cloud.data) {
+        const categories = cloud.data.categories || [];
+        const currentCategoryId = categories[0]?.id ?? null;
+        setState({ categories, currentCategoryId });
+        updateAuthUI();
+        return;
+      }
+    } catch (_) {}
     const data = await window.QRMStorage.getData();
     const categories = data.categories || [];
     const currentCategoryId = categories[0]?.id ?? null;
     setState({ categories, currentCategoryId });
+    updateAuthUI();
   }
 
   function saveCategories(categories) {
@@ -74,11 +92,21 @@
     copyBtn.className = 'btn primary';
     copyBtn.textContent = 'Copier';
     copyBtn.addEventListener('click', async () => {
+      const ok = await copyToClipboard(tmpl.text);
+      copyBtn.textContent = ok ? 'Copié!' : 'Échec copie';
+      setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
+    });
+
+    const pasteBtn = document.createElement('button');
+    pasteBtn.className = 'btn';
+    pasteBtn.textContent = 'Coller ici';
+    pasteBtn.title = 'Coller dans la conversation active';
+    pasteBtn.addEventListener('click', async () => {
       try {
-        await navigator.clipboard.writeText(tmpl.text);
-        copyBtn.textContent = 'Copié!';
-        setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
-      } catch (e) {}
+        await chrome.runtime.sendMessage({ type: 'QRM_PASTE', text: tmpl.text });
+        pasteBtn.textContent = 'Collé!';
+        setTimeout(() => (pasteBtn.textContent = 'Coller ici'), 1200);
+      } catch (_) {}
     });
 
     const editBtn = document.createElement('button');
@@ -97,13 +125,15 @@
       detail.innerHTML = '';
     });
 
-    actions.append(copyBtn, editBtn, delBtn);
+    actions.append(copyBtn, pasteBtn, editBtn, delBtn);
     header.append(h3, actions);
 
     const pre = document.createElement('textarea');
     pre.className = 'detail-text';
     pre.value = tmpl.text;
     pre.readOnly = true;
+    autoResizeTextArea(pre);
+    pre.addEventListener('dblclick', () => openTemplateEditor(tmpl));
 
     detail.append(header, pre);
   }
@@ -129,6 +159,8 @@
     textArea.className = 'textarea';
     textArea.required = true;
     textArea.value = tmpl.text;
+    autoResizeTextArea(textArea);
+    textArea.addEventListener('input', () => autoResizeTextArea(textArea));
 
     const buttons = document.createElement('div');
     buttons.className = 'form-actions';
@@ -149,6 +181,7 @@
       e.preventDefault();
       const updated = { ...tmpl, title: titleInput.value.trim(), text: textArea.value };
       await window.QRMStorage.upsertTemplate(state.currentCategoryId, updated);
+      try { await window.QRMCloud.pushLocalToCloud(); } catch (_) {}
       const data = await window.QRMStorage.getData();
       setState({ categories: data.categories });
       showTemplate(updated);
@@ -163,6 +196,7 @@
     const newCat = { id: crypto.randomUUID(), name, templates: [] };
     const categories = [...state.categories, newCat];
     await saveCategories(categories);
+    try { await window.QRMCloud.pushLocalToCloud(); } catch (_) {}
     setState({ categories, currentCategoryId: newCat.id });
   }
 
@@ -173,6 +207,7 @@
     if (!name) return;
     const categories = state.categories.map(c => c.id === cat.id ? { ...c, name } : c);
     await saveCategories(categories);
+    try { await window.QRMCloud.pushLocalToCloud(); } catch (_) {}
     setState({ categories });
   }
 
@@ -181,6 +216,7 @@
     if (!cat) return;
     if (!confirm('Supprimer cette catégorie et tous ses modèles ?')) return;
     await window.QRMStorage.deleteCategory(cat.id);
+    try { await window.QRMCloud.pushLocalToCloud(); } catch (_) {}
     const data = await window.QRMStorage.getData();
     const nextId = data.categories[0]?.id ?? null;
     setState({ categories: data.categories, currentCategoryId: nextId });
@@ -201,6 +237,78 @@
     renderDetailEmpty();
   }
 
+  function updateAuthUI() {
+    try {
+      const s = window.QRMCloud.getAuthState();
+      if (s && s.user) {
+        auth.signedIn = true;
+        auth.email = s.user.email || '';
+      } else {
+        auth.signedIn = false;
+        auth.email = '';
+      }
+    } catch (_){}
+    if (auth.signedIn) {
+      userEmail.textContent = auth.email;
+      signedIn.classList.remove('hidden');
+      signInBtn.classList.add('hidden');
+    } else {
+      signedIn.classList.add('hidden');
+      signInBtn.classList.remove('hidden');
+    }
+  }
+
+  async function onSignIn() {
+    try {
+      await window.QRMCloud.signIn(true);
+      updateAuthUI();
+      const cloud = await window.QRMCloud.loadIfSignedIn();
+      if (cloud && cloud.data) {
+        await window.QRMStorage.setData(cloud.data);
+        const data = await window.QRMStorage.getData();
+        setState({ categories: data.categories, currentCategoryId: data.categories[0]?.id ?? null });
+      }
+    } catch (e) {}
+  }
+
+  async function onSignOut() {
+    try { await window.QRMCloud.signOut(); } catch (_) {}
+    updateAuthUI();
+  }
+
+  async function onSyncNow() {
+    try { await window.QRMCloud.pushLocalToCloud(); } catch (_) {}
+  }
+
+  function autoResizeTextArea(el) {
+    try {
+      el.style.height = 'auto';
+      el.style.height = Math.min(800, el.scrollHeight) + 'px';
+    } catch (_) {}
+  }
+
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (_) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
   // Event bindings
   categorySelect.addEventListener('change', () => setState({ currentCategoryId: categorySelect.value }));
   searchInput.addEventListener('input', () => setState({ query: searchInput.value }));
@@ -208,6 +316,9 @@
   renameCategoryBtn.addEventListener('click', onRenameCategory);
   deleteCategoryBtn.addEventListener('click', onDeleteCategory);
   addTemplateBtn.addEventListener('click', () => openTemplateEditor());
+  signInBtn?.addEventListener('click', onSignIn);
+  signOutBtn?.addEventListener('click', onSignOut);
+  syncBtn?.addEventListener('click', onSyncNow);
 
   // Initialize
   load();

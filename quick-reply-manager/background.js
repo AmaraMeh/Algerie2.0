@@ -97,6 +97,13 @@ chrome.runtime.onMessage.addListener(async (msg, sender) => {
     if (tabId != null && visibleTabs.delete(tabId)) {
       await saveVisibleTabs();
     }
+  } else if (msg.type === "QRM_PASTE") {
+    try {
+      const tabId = sender?.tab?.id ?? (await getActiveTab())?.id;
+      if (tabId == null) return;
+      try { await ensureContentScriptInjected(tabId); } catch (_) {}
+      await chrome.tabs.sendMessage(tabId, { type: "QRM_PASTE", text: msg.text || "" });
+    } catch (_) {}
   }
 });
 

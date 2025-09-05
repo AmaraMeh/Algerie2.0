@@ -15,6 +15,14 @@
       </div>
       <div class="actions">
         <input id="searchInput" type="search" placeholder="Rechercher..." class="input">
+        <div id="authControls" class="auth-controls">
+          <button id="signInBtn" class="btn">Se connecter</button>
+          <div id="signedIn" class="hidden">
+            <span id="userEmail" class="user-email"></span>
+            <button id="syncBtn" class="btn">Sync</button>
+            <button id="signOutBtn" class="btn btn-ghost">Déconnexion</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -36,6 +44,7 @@
     </main>
   </div>
 
+  <script src="firebase.js"></script>
   <script src="storage.js"></script>
   <script src="popup.js"></script>
   <script>
@@ -44,6 +53,13 @@
     if (params.get('embedded') === '1') {
       document.body.classList.add('embedded');
     }
+    // Allow popup to auto-size when top-level action popup context
+    try {
+      if (window.top === window && !document.body.classList.contains('embedded')) {
+        document.documentElement.style.width = '420px';
+        document.documentElement.style.height = '640px';
+      }
+    } catch (_) {}
   </script>
 </body>
 </html>
